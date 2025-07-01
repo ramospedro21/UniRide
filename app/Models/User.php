@@ -23,6 +23,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'document',
+        'cellphone',
+        'driver_document',
+        'driver_document_code'
     ];
 
     /**
