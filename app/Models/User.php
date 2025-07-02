@@ -21,12 +21,14 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'surname',
         'email',
         'password',
         'document',
         'cellphone',
         'driver_document',
-        'driver_document_code'
+        'driver_document_code',
+        'profile_photo'
     ];
 
     /**

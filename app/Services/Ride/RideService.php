@@ -29,14 +29,14 @@ class RideService
 
     public function update($id, array $data)
     {
-        $Ride = $this->rideRepository->find($id);
-        return $this->rideRepository->update($Ride, $data);
+        $ride = $this->rideRepository->find($id);
+        return $this->rideRepository->update($ride, $data);
     }
 
     public function delete($id)
     {
-        $Ride = $this->rideRepository->find($id);
-        return $this->rideRepository->delete($Ride);
+        $ride = $this->rideRepository->find($id);
+        return $this->rideRepository->delete($ride);
     }
 
 }

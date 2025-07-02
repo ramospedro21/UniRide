@@ -4,29 +4,36 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\User\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
-{
-    public function __construct() {}
+{   
+    protected $userService;
+
+    public function __construct(UserService $userService) {
+        $this->userService = $userService;
+    }
 
     public function register(Request $request)
     {
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        return response()->json(['message' => 'Usuário registrado com sucesso']);
+        try {
+            $data = $request->validate([
+                'name' => 'required|string|max:255',
+                'surname' => 'required|string|max:255',
+                'email' => 'required|email|unique:users',
+                'password' => 'required|string|min:6',
+                'cellphone' => 'required|string|max:11',
+                'document' => 'required|string|max:11'
+            ]);
+    
+            $this->userService->create($data);
+    
+            return $this->respondWithOk('Usuário cadastrado com sucesso');
+        } catch (\Exception $e) {
+            return $this->respondWithErrors($e->getMessage());
+        }
 
     }
 
