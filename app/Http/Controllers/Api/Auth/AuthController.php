@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\User\UserService;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -19,18 +21,30 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
-            $data = $request->validate([
+            $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'surname' => 'required|string|max:255',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|string|min:6',
                 'cellphone' => 'required|string|max:11',
-                'document' => 'required|string|max:11'
+                'document' => 'required|string|unique:users|max:11'
             ]);
-    
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $data = $validator->validated();
+
             $this->userService->create($data);
-    
+
             return $this->respondWithOk('Usuário cadastrado com sucesso');
+
+        } catch (ValidationException $e) {
+
+            $firstError = $e->validator->errors()->first();
+            return $this->respondWithErrors($firstError);
+
         } catch (\Exception $e) {
             return $this->respondWithErrors($e->getMessage());
         }
