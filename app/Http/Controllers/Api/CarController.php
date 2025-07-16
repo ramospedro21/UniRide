@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\Car\CarService;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 class CarController extends Controller
@@ -24,18 +26,36 @@ class CarController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            "driver_id" => "required|integer",
-            "brand" => "required|string",
-            "model" => "required|string",
-            "color" => "required|string",
-            "plate" => "required|string",
-            "is_default_veichle" => "required|boolean",
-        ]);
+        try {
 
-        $this->carService->create($data);
+            $validator = Validator::make($request->all(), [
+                "driver_id" => "required|integer",
+                "brand" => "required|string",
+                "model" => "required|string",
+                "plate" => "required|string",
+                "color" => "required|string",
+                "is_default_veichle" => "required|boolean",
+            ]);
 
-        return $this->respondWithOk([], 201);
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $data = $validator->validated();
+    
+            $this->carService->create($data);
+    
+            return $this->respondWithOk([], 201);
+        } catch (ValidationException $e) {
+
+            $firstError = $e->validator->errors()->first();
+            return $this->respondWithErrors($firstError);
+
+        } catch (\Exception $e) {
+
+            return $this->respondWithErrors($e->getMessage());
+
+        }
     }
 
     public function show($id)
