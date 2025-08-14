@@ -39,4 +39,8 @@ class CarService
         return $this->carRepository->delete($car);
     }
 
+    public function getCarsByUser($userId)
+    {
+        return $this->carRepository->getCarsByUser($userId);
+    }
 }

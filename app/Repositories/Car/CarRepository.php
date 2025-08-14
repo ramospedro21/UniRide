@@ -30,4 +30,9 @@ class CarRepository
     {
         return $car->delete();
     }
+
+    public function getCarsByUser($userId)
+    {
+        return Car::where('driver_id', $userId)->get();
+    }
 }

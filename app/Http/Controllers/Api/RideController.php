@@ -18,9 +18,10 @@ class RideController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $rides = $this->rideService->all();
+        $data = $request->all();
+        $rides = $this->rideService->all($data);
 
         return $this->respondWithOk($rides);
     }

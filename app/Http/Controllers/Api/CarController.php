@@ -78,4 +78,11 @@ class CarController extends Controller
 
         return $this->respondWithOk();
     }
+
+    public function getCarsByUser($userId)
+    {
+        $cars = $this->carService->getCarsByUser($userId);
+
+        return $this->respondWithOk($cars);
+    }
 }

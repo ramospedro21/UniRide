@@ -12,9 +12,9 @@ class RideService
         $this->rideRepository = $rideRepository;
     }
 
-    public function all()
+    public function all(array $data = [])
     {
-        return $this->rideRepository->all();
+        return $this->rideRepository->searchNearby($data);
     }
 
     public function create(array $data)

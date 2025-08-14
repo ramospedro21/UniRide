@@ -17,4 +17,9 @@ class Ride extends Model
         'capacity',
         'ride_fare'
     ];
+
+    public function passengerRides()
+    {
+        return $this->hasMany(PassengerRide::class);
+    }
 }
