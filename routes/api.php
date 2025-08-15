@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\CarController;
+use App\Http\Controllers\Api\PassengerRideController;
 use App\Http\Controllers\Api\RideController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,4 +26,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/rides/{ride_id}', [RideController::class, 'show']);
     Route::patch('/rides/{ride_id}', [RideController::class, 'update']);
     Route::delete('/rides/{ride_id}', [RideController::class, 'delete']);
+
+    Route::post('/passengerRides', [PassengerRideController::class, 'store']);
 });

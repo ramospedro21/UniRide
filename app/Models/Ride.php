@@ -22,4 +22,14 @@ class Ride extends Model
     {
         return $this->hasMany(PassengerRide::class);
     }
+
+    public function driver()
+    {
+        return $this->belongsTo(User::class, 'driver_id');
+    }
+
+    public function car()
+    {
+        return $this->belongsTo(Car::class, 'car_id');
+    }
 }

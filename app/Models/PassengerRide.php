@@ -16,7 +16,7 @@ class PassengerRide extends Model
     protected $table = 'passenger_rides';
 
     protected $fillable = [
-        'passenger_id',
+        'user_id',
         'ride_id',
         'evaluation',
         'status',

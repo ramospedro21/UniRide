@@ -41,27 +41,30 @@ class RideRepository
         $maxDistanceKm = 10;
 
         return Ride::select('*')
-            ->whereRaw('
+            ->with(['driver', 'car'])
+            ->selectRaw('
                 (6371 * acos(
                     cos(radians(?)) * cos(radians(departure_location_lat)) *
                     cos(radians(departure_location_long) - radians(?)) +
                     sin(radians(?)) * sin(radians(departure_location_lat))
-                )) < ?
-            ', [$departureLat, $departureLng, $departureLat, $maxDistanceKm])
-            ->whereRaw('
+                )) AS departure_distance
+            ', [$departureLat, $departureLng, $departureLat])
+            ->selectRaw('
                 (6371 * acos(
                     cos(radians(?)) * cos(radians(arrive_location_lat)) *
                     cos(radians(arrive_location_long) - radians(?)) +
                     sin(radians(?)) * sin(radians(arrive_location_lat))
-                )) < ?
-            ', [$arrivalLat, $arrivalLng, $arrivalLat, $maxDistanceKm])
+                )) AS arrival_distance
+            ', [$arrivalLat, $arrivalLng, $arrivalLat])
+            ->havingRaw('departure_distance < ?', [$maxDistanceKm])
+            ->havingRaw('arrival_distance < ?', [$maxDistanceKm])
             ->whereRaw('
                 capacity > (
                     SELECT COUNT(*) FROM passenger_rides
                     WHERE passenger_rides.ride_id = rides.id
                 )
             ')
-            ->orderBy('departure_time')
+            ->orderByRaw('(departure_distance + arrival_distance) ASC')
             ->get();
     }
 }
