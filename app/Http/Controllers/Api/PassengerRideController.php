@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 
 class PassengerRideController extends Controller
 {
-
     protected $passengerRideService;
 
     public function __construct(PassengerRideService $passengerRideService) {

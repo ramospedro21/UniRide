@@ -3,6 +3,7 @@
 namespace App\Repositories\Ride;
 
 Use App\Models\Ride;
+use App\Models\RideWeekDay;
 
 class RideRepository 
 {
@@ -31,6 +32,18 @@ class RideRepository
         return $ride->delete();
     }
 
+    public function saveWeekDays(Ride $ride, array $weekDays)
+    {
+        $rideWeekDays = [];
+        foreach ($weekDays as $day) {
+            $rideWeekDays[] = [
+                'ride_id' => $ride->id,
+                'day_of_week' => $day,
+            ];
+        }
+        return $ride->weekDays()->createMany($rideWeekDays);
+    }
+
     public function searchNearby(array $data)
     {
         $departureLat = $data['departure_lat'] ?? null;
@@ -40,31 +53,50 @@ class RideRepository
 
         $maxDistanceKm = 10;
 
-        return Ride::select('*')
-            ->with(['driver', 'car'])
-            ->selectRaw('
-                (6371 * acos(
-                    cos(radians(?)) * cos(radians(departure_location_lat)) *
-                    cos(radians(departure_location_long) - radians(?)) +
-                    sin(radians(?)) * sin(radians(departure_location_lat))
-                )) AS departure_distance
-            ', [$departureLat, $departureLng, $departureLat])
-            ->selectRaw('
-                (6371 * acos(
-                    cos(radians(?)) * cos(radians(arrive_location_lat)) *
-                    cos(radians(arrive_location_long) - radians(?)) +
-                    sin(radians(?)) * sin(radians(arrive_location_lat))
-                )) AS arrival_distance
-            ', [$arrivalLat, $arrivalLng, $arrivalLat])
-            ->havingRaw('departure_distance < ?', [$maxDistanceKm])
-            ->havingRaw('arrival_distance < ?', [$maxDistanceKm])
-            ->whereRaw('
-                capacity > (
-                    SELECT COUNT(*) FROM passenger_rides
-                    WHERE passenger_rides.ride_id = rides.id
-                )
-            ')
-            ->orderByRaw('(departure_distance + arrival_distance) ASC')
-            ->get();
+        return Ride::with(['driver', 'car', 'weekDays'])
+                ->leftJoin('passenger_rides', 'rides.id', '=', 'passenger_rides.ride_id')
+                ->select('rides.*')
+                ->selectRaw('
+                    (COUNT(passenger_rides.id)) AS passengers_count
+                ')
+                ->selectRaw('
+                    (capacity - COUNT(passenger_rides.id)) AS available_seats
+                ')
+                ->selectRaw('
+                    (6371 * acos(
+                        cos(radians(?)) * cos(radians(departure_location_lat)) *
+                        cos(radians(departure_location_long) - radians(?)) +
+                        sin(radians(?)) * sin(radians(departure_location_lat))
+                    )) AS departure_distance
+                ', [$departureLat, $departureLng, $departureLat])
+                ->selectRaw('
+                    (6371 * acos(
+                        cos(radians(?)) * cos(radians(arrive_location_lat)) *
+                        cos(radians(arrive_location_long) - radians(?)) +
+                        sin(radians(?)) * sin(radians(arrive_location_lat))
+                    )) AS arrival_distance
+                ', [$arrivalLat, $arrivalLng, $arrivalLat])
+                ->groupBy('rides.id')
+                ->havingRaw('available_seats > 0')
+                ->havingRaw('departure_distance < ?', [$maxDistanceKm])
+                ->havingRaw('arrival_distance < ?', [$maxDistanceKm])
+                ->orderByRaw('(departure_distance + arrival_distance) ASC')
+                ->get()
+                ->map(function ($ride) {
+                    return [
+                        'id' => $ride->id,
+                        'driver' => $ride->driver,
+                        'car' => $ride->car,
+                        'departure_time' => $ride->departure_time,
+                        'capacity' => $ride->capacity,
+                        'ride_fare' => $ride->ride_fare,
+                        'passengers_count' => $ride->passengers_count,
+                        'available_seats' => $ride->available_seats,
+                        'departure_distance' => $ride->departure_distance,
+                        'arrival_distance' => $ride->arrival_distance,
+                        'week_days' => $ride->week_days_translated,
+                    ];
+                });
+
     }
 }

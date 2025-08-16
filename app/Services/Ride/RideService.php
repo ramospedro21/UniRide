@@ -19,7 +19,9 @@ class RideService
 
     public function create(array $data)
     {
-        return $this->rideRepository->create($data);
+        $ride = $this->rideRepository->create($data);
+        $this->rideRepository->saveWeekDays($ride, $data['week_days']);
+        return $ride;
     }
 
     public function show($id)

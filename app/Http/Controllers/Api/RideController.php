@@ -34,15 +34,17 @@ class RideController extends Controller
         try {
 
             $validator = Validator::make($request->all(), [
-                'driver_id' => 'required|integer',
-                'car_id' => 'required|integer',
+                'driver_id' => 'required|integer|exists:users,id',
+                'car_id' => 'required|integer|exists:cars,id',
                 'departure_location_lat' => 'required|string',
                 'departure_location_long' => 'required|string',
                 'arrive_location_lat' => 'required|string',
                 'arrive_location_long' => 'required|string',
                 'departure_time' => 'required|date_format:H:i',
-                'capacity' => 'required|integer',
-                'ride_fare' => 'required|decimal:0,8',
+                'capacity' => 'required|integer|min:1',
+                'ride_fare' => 'required|numeric|min:0',
+                'week_days' => 'required|array|min:1',
+                'week_days.*' => 'integer|between:0,6',
             ]);
 
             if ($validator->fails()) {

@@ -32,4 +32,24 @@ class Ride extends Model
     {
         return $this->belongsTo(Car::class, 'car_id');
     }
+
+    public function weekDays()
+    {
+        return $this->hasMany(RideWeekDay::class);
+    }
+
+    public function getWeekDaysTranslatedAttribute()
+    {
+        $days = [
+            0 => 'Segunda-feira',
+            1 => 'Terça-feira',
+            2 => 'Quarta-feira',
+            3 => 'Quinta-feira',
+            4 => 'Sexta-feira',
+            5 => 'Sábado',
+            6 => 'Domingo',
+        ];
+
+        return $this->weekDays->map(fn($wd) => $days[$wd->day_of_week] ?? null);
+    }
 }
