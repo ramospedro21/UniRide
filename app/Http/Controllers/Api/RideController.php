@@ -45,6 +45,7 @@ class RideController extends Controller
                 'ride_fare' => 'required|numeric|min:0',
                 'week_days' => 'required|array|min:1',
                 'week_days.*' => 'integer|between:0,6',
+                'departure_address' => 'string',
             ]);
 
             if ($validator->fails()) {

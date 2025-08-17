@@ -19,8 +19,11 @@ class RideService
 
     public function create(array $data)
     {
+        $data['arrival_address'] = "UNIP - Rod. Pres. Dutra, km 157 - 5 - Limoeiro, São José dos Campos - SP, 12240-420";
+
         $ride = $this->rideRepository->create($data);
         $this->rideRepository->saveWeekDays($ride, $data['week_days']);
+
         return $ride;
     }
 

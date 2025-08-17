@@ -95,6 +95,8 @@ class RideRepository
                         'departure_distance' => $ride->departure_distance,
                         'arrival_distance' => $ride->arrival_distance,
                         'week_days' => $ride->week_days_translated,
+                        'departure_address' => $ride->departure_address,
+                        'arrival_address' => $ride->arrival_address,
                     ];
                 });
 

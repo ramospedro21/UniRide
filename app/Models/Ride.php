@@ -11,8 +11,10 @@ class Ride extends Model
         'car_id',
         'departure_location_lat',
         'departure_location_long',
+        'departure_address',
         'arrive_location_lat',
         'arrive_location_long',
+        'arrival_address',
         'departure_time',
         'capacity',
         'ride_fare'

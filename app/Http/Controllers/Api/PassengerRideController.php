@@ -8,6 +8,7 @@ use App\Services\PassengerRide\PassengerRideService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PassengerRideController extends Controller
 {
@@ -32,8 +33,16 @@ class PassengerRideController extends Controller
         try {
 
             $validator = Validator::make($request->all(), [
-                'ride_id' => 'required|integer',
+                'ride_id' => [
+                    'required',
+                    'integer',
+                    Rule::unique('passenger_rides')->where(function ($query) use ($request) {
+                        return $query->where('user_id', $request->user_id);
+                    }),
+                ],
                 'user_id' => 'required|integer',
+            ], [
+                'ride_id.unique' => 'Você já reservou essa carona.',
             ]);
 
             if ($validator->fails()) {
