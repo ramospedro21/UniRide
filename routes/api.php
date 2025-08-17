@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\CarController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PassengerRideController;
 use App\Http\Controllers\Api\RideController;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::post('/save-device-token', [NotificationController::class, 'store']);
 
     Route::get('/cars', [CarController::class, 'index']);
     Route::post('/cars', [CarController::class, 'store']);

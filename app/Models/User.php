@@ -28,7 +28,8 @@ class User extends Authenticatable
         'cellphone',
         'driver_document',
         'driver_document_code',
-        'profile_photo'
+        'profile_photo',
+        'device_token',
     ];
 
     /**

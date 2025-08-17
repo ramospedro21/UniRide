@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\PassengerRide;
+use App\Models\Ride;
+use App\Models\User;
+use App\Services\Notifications\PushNotificationsService;
 use App\Services\PassengerRide\PassengerRideService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class PassengerRideController extends Controller
@@ -31,6 +34,7 @@ class PassengerRideController extends Controller
     public function store(Request $request)
     {
         try {
+            DB::beginTransaction();
 
             $validator = Validator::make($request->all(), [
                 'ride_id' => [
@@ -52,17 +56,33 @@ class PassengerRideController extends Controller
             $data = $validator->validated();
 
             $this->passengerRideService->create($data);
-    
+
+            $ride = Ride::find($data['ride_id']);
+            $driver = User::find($ride->driver_id);
+            $passenger = User::find($data['user_id']);
+
+            if ($driver && $driver->device_token) {
+                PushNotificationsService::sendNotification(
+                    $driver->device_token,
+                    "Nova reserva na sua carona 🚗",
+                    "{$passenger->name} acabou de reservar um assento na sua carona!",
+                    [
+                        'ride_id' => $ride->id,
+                        'passenger_id' => $passenger->id
+                    ]
+                );
+            }
+
+            DB::commit();
+
             return $this->respondWithOk();
 
         } catch (ValidationException $e) {
-
             $firstError = $e->validator->errors()->first();
             return $this->respondWithErrors($firstError);
 
         } catch (\Exception $e) {
             return $this->respondWithErrors($e->getMessage());
-
         }
     }
 
