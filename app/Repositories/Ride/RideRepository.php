@@ -2,8 +2,10 @@
 
 namespace App\Repositories\Ride;
 
+use App\Models\PassengerRide;
 Use App\Models\Ride;
 use App\Models\RideWeekDay;
+use Mockery\Generator\StringManipulation\Pass\Pass;
 
 class RideRepository 
 {
@@ -100,5 +102,31 @@ class RideRepository
                     ];
                 });
 
+    }
+
+    public function getRequestedByUser(int $userId)
+    {
+        return PassengerRide::with('ride')
+            ->where('user_id', $userId)
+            ->get();
+    }
+
+    public function getOfferedByUser(int $userId)
+    {
+        return Ride::with('passengerRides')
+            ->where('driver_id', $userId)
+            ->get();
+    }
+
+    public function getPendingRidesForDriver(int $driverId)
+    {
+        return Ride::with(['passengerRides' => function($query) {
+                $query->where('status', PassengerRide::STATUS['PENDING'])->with('passenger');
+            }])
+            ->where('driver_id', $driverId)
+            ->whereHas('passengerRides', function($query) {
+                $query->where('status', PassengerRide::STATUS['PENDING']);
+            })
+            ->get();
     }
 }

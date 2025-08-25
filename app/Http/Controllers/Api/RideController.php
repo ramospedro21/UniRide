@@ -99,4 +99,24 @@ class RideController extends Controller
 
         return $this->respondWithOk();
     }
+
+    public function getRidesByUser($user_id)
+    {
+        try {
+            $rides = $this->rideService->getByUser($user_id);
+            return $this->respondWithOk($rides);
+        } catch (\Exception $e) {
+            return $this->respondWithErrors($e->getMessage());
+        }
+    }
+
+    public function getRidesWithPendingRequests($driverId)
+    {
+        try {
+            $rides = $this->rideService->getPendingRidesForDriver($driverId);
+            return $this->respondWithOk($rides);
+        } catch (\Exception $e) {
+            return $this->respondWithErrors($e->getMessage());
+        }
+    }
 }

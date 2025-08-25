@@ -29,6 +29,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/rides/{ride_id}', [RideController::class, 'show']);
     Route::patch('/rides/{ride_id}', [RideController::class, 'update']);
     Route::delete('/rides/{ride_id}', [RideController::class, 'delete']);
+    Route::get('/getRidesByUser/{user_id}', [RideController::class, 'getRidesByUser']);
+    Route::get('/driver/{driverId}/ridesWithPendingRequests', [RideController::class, 'getRidesWithPendingRequests']);
 
+
+    Route::get('/passengerRides', [PassengerRideController::class, 'index']);
     Route::post('/passengerRides', [PassengerRideController::class, 'store']);
+    Route::get('/passengerRides/{passenger_ride_id}', [PassengerRideController::class, 'show']);
+    Route::patch('/passengerRides/{passenger_ride_id}', [PassengerRideController::class, 'update']);
+    Route::delete('/passengerRides/{passenger_ride_id}', [PassengerRideController::class, 'delete']);
 });

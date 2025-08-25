@@ -9,8 +9,7 @@ class PassengerRide extends Model
     const STATUS = [
         'PENDING' => 0,
         'ACCEPTED' => 1,
-        'COMPLETED' => 2,
-        'CANCELLED' => 3,   
+        'CANCELLED' => 2,   
     ];
 
     protected $table = 'passenger_rides';
@@ -26,7 +25,7 @@ class PassengerRide extends Model
 
     public function passenger()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function ride()
