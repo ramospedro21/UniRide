@@ -20,6 +20,8 @@ class Ride extends Model
         'ride_fare'
     ];
 
+    protected $appends = ['week_days_translated'];
+
     public function passengerRides()
     {
         return $this->hasMany(PassengerRide::class);

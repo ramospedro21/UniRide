@@ -16,7 +16,22 @@ class RideRepository
 
     public function find($id)
     {
-        return Ride::find($id);
+        $ride = Ride::with('driver', 'passengerRides.passenger', 'car')->find($id);
+
+        $ride->passengers = $ride->passengerRides
+        ->filter(fn($pr) => in_array($pr->status, [
+            PassengerRide::STATUS['PENDING'],
+            PassengerRide::STATUS['ACCEPTED']
+        ]))
+        ->map(fn($pr) => [
+            'id' => $pr->passenger->id,
+            'passenger_ride_id' => $pr->id,
+            'name' => $pr->passenger->name,
+            'phone' => $pr->passenger->phone,
+            'status' => $pr->status === PassengerRide::STATUS['PENDING'] ? 'Pendente' : 'Confirmada'
+        ]);
+
+        return $ride;
     }
 
     public function create(array $data)

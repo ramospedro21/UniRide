@@ -38,4 +38,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/passengerRides/{passenger_ride_id}', [PassengerRideController::class, 'show']);
     Route::patch('/passengerRides/{passenger_ride_id}', [PassengerRideController::class, 'update']);
     Route::delete('/passengerRides/{passenger_ride_id}', [PassengerRideController::class, 'delete']);
+    Route::post('/passengerRides/{passenger_ride_id}/handleReservation', [PassengerRideController::class, 'handleReservation']);
 });

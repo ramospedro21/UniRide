@@ -109,4 +109,63 @@ class PassengerRideController extends Controller
     {
         //
     }
+
+    public function handleReservation(Request $request, int $passenger_ride_id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $validator = Validator::make($request->all(), [
+                'action' => [
+                    'required',
+                    Rule::in(['approve', 'reject']),
+                ],
+                'ride_id' => 'required|integer',
+                'passenger_id' => 'required|integer',
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $data = $validator->validated();
+
+            $this->passengerRideService->handleReservation($passenger_ride_id, $data['action']);
+
+            $ride = Ride::find($data['ride_id']);
+            $driver = User::find($ride->driver_id);
+            $passenger = User::find($data['passenger_id']);
+
+            if ($passenger && $passenger->device_token) {
+                if($data['action'] === 'approve') {
+                    $headMessage = "Sua reserva na carona de {$driver->name} foi aprovada! 🚗";
+                    $bodyMessage = "Prepare-se para a viagem!";
+                } else {
+                    $headMessage = "Sua reserva na carona de {$driver->name} foi rejeitada. 😞";
+                    $bodyMessage = "Infelizmente, sua reserva não foi aprovada.";
+                }
+
+                PushNotificationsService::sendNotification(
+                    $passenger->device_token,
+                    $headMessage,
+                    $bodyMessage,
+                    [
+                        'ride_id' => $ride->id,
+                        'passenger_id' => $passenger->id
+                    ]
+                );
+            }
+
+            DB::commit();
+
+            return $this->respondWithOk();
+
+        } catch (ValidationException $e) {
+            $firstError = $e->validator->errors()->first();
+            return $this->respondWithErrors($firstError);
+
+        } catch (\Exception $e) {
+            return $this->respondWithErrors($e->getMessage());
+        }
+    }
 }

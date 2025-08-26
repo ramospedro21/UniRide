@@ -30,4 +30,18 @@ class PassengerRideRepository
     {
         return $ride->delete();
     }
+
+    public function handleReservation(PassengerRide $passengerRide, $action)
+    {
+        if ($action === 'approve') {
+            $passengerRide->status = PassengerRide::STATUS['ACCEPTED'];
+        } elseif ($action === 'reject') {
+            $passengerRide->status = PassengerRide::STATUS['CANCELLED'];
+        } else {
+            throw new \InvalidArgumentException("Ação inválida. Use 'accept' ou 'reject'.");
+        }
+
+        $passengerRide->save();
+        return $passengerRide;
+    }
 }

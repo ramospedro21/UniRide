@@ -39,4 +39,10 @@ class PassengerRideService
         return $this->passengerRideRepository->delete($ride);
     }
 
+    public function handleReservation($id, $action)
+    {
+        $passengerRide = $this->passengerRideRepository->find($id);
+        return $this->passengerRideRepository->handleReservation($passengerRide, $action);
+    }
+
 }
