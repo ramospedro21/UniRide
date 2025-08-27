@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\CarController;
+use App\Http\Controllers\Api\ConversationController;
+use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PassengerRideController;
 use App\Http\Controllers\Api\RideController;
+use App\Http\Controllers\Api\UsersController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -16,6 +19,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::post('/save-device-token', [NotificationController::class, 'store']);
+
+    Route::get('/users/{user_id}', [UsersController::class, 'show']);
+    Route::patch('/users/{user_id}', [UsersController::class, 'update']);
+    Route::delete('/users/{user_id}', [UsersController::class, 'delete']);
 
     Route::get('/cars', [CarController::class, 'index']);
     Route::post('/cars', [CarController::class, 'store']);
@@ -39,4 +46,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/passengerRides/{passenger_ride_id}', [PassengerRideController::class, 'update']);
     Route::delete('/passengerRides/{passenger_ride_id}', [PassengerRideController::class, 'delete']);
     Route::post('/passengerRides/{passenger_ride_id}/handleReservation', [PassengerRideController::class, 'handleReservation']);
+
+    Route::get('/conversations', [ConversationController::class, 'index']);
+    Route::post('/conversations', [ConversationController::class, 'store']);
+    Route::get('/messages/{conversation}', [MessageController::class, 'show']);
+    Route::post('/messages', [MessageController::class, 'store']);
+    Route::post('messages/{conversation}/mark-as-read', [MessageController::class, 'markAsRead']);
+
 });
