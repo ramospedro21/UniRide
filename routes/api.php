@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/save-device-token', [NotificationController::class, 'store']);
 
     Route::get('/users/{user_id}', [UsersController::class, 'show']);
-    Route::patch('/users/{user_id}', [UsersController::class, 'update']);
+    Route::post('/users/{user_id}', [UsersController::class, 'update']);
     Route::delete('/users/{user_id}', [UsersController::class, 'delete']);
 
     Route::get('/cars', [CarController::class, 'index']);
@@ -38,7 +38,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/rides/{ride_id}', [RideController::class, 'delete']);
     Route::get('/getRidesByUser/{user_id}', [RideController::class, 'getRidesByUser']);
     Route::get('/driver/{driverId}/ridesWithPendingRequests', [RideController::class, 'getRidesWithPendingRequests']);
-
 
     Route::get('/passengerRides', [PassengerRideController::class, 'index']);
     Route::post('/passengerRides', [PassengerRideController::class, 'store']);

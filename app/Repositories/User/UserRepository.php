@@ -25,8 +25,10 @@ class UserRepository
 
     public function update(User $user, array $data)
     {
-        if(isset($data['password'])) {
+        if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
         }
 
         return $user->update($data);
