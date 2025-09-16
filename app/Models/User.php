@@ -54,4 +54,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function givenRatings() {
+        return $this->hasMany(Rating::class, 'reviewer_id');
+    }
+
+    public function receivedRatings() {
+        return $this->hasMany(Rating::class, 'reviewed_id');
+    }
+
+    public function averageRating(): float {
+        return $this->receivedRatings()->avg('score') ?? 0;
+    }
 }

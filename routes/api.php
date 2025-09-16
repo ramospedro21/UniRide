@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PassengerRideController;
+use App\Http\Controllers\Api\RatingsController;
 use App\Http\Controllers\Api\RideController;
 use App\Http\Controllers\Api\UsersController;
 use Illuminate\Support\Facades\Route;
@@ -51,5 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/messages/{conversation}', [MessageController::class, 'show']);
     Route::post('/messages', [MessageController::class, 'store']);
     Route::post('messages/{conversation}/mark-as-read', [MessageController::class, 'markAsRead']);
+
+    Route::post('/ratings', [RatingsController::class, 'store']);
 
 });
