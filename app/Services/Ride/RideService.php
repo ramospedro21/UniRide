@@ -3,18 +3,54 @@
 namespace App\Services\Ride;
 
 use App\Repositories\Ride\RideRepository;
+use App\Services\RideMatching\RideMatchingService;
+use Carbon\Carbon;
 
 class RideService
 {
     protected $rideRepository;
+    protected $matchingService;
 
-    public function __construct(RideRepository $rideRepository) {
+    public function __construct(RideRepository $rideRepository, RideMatchingService $matchingService) {
         $this->rideRepository = $rideRepository;
+        $this->matchingService = $matchingService;
     }
 
     public function all(array $data = [])
     {
-        return $this->rideRepository->searchNearby($data);
+        $rides = $this->rideRepository->searchNearby($data);
+        $requestedDays = $data['days'] ?? [];
+
+        // Aplica heurística e filtra rides sem coincidência de dias
+        $scored = $rides->filter(function ($ride) use ($requestedDays) {
+            $rideDays = $ride->weekDays->pluck('day_of_week')->toArray();
+            return count(array_intersect($requestedDays, $rideDays)) > 0;
+        })->map(function ($ride) use ($data) {
+
+            $score = $this->matchingService->calculateScore($ride, $data);
+
+            return [
+                'id' => $ride->id,
+                'driver' => [
+                    'id' => $ride->driver->id,
+                    'name' => $ride->driver->name,
+                    'rating' => round($ride->driver->averageRating(), 2),
+                ],
+                'car' => $ride->car,
+                'departure_time' => $ride->departure_time,
+                'capacity' => $ride->capacity,
+                'ride_fare' => $ride->ride_fare,
+                'passengers_count' => $ride->passengers_count,
+                'available_seats' => $ride->available_seats,
+                'departure_distance' => $ride->departure_distance,
+                'week_days' => $ride->week_days_translated,
+                'departure_address' => $ride->departure_address,
+                'arrival_address' => $ride->arrival_address,
+                'matching_score' => $score,
+            ];
+        });
+
+        return $scored->sortByDesc('matching_score')->values();
     }
 
     public function create(array $data)
