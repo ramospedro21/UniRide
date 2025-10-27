@@ -73,9 +73,9 @@ class RideController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
+    public function show(Request $request, int $id)
     {
-        $ride = $this->rideService->show($id);
+        $ride = $this->rideService->show($request->user()->id, $id);
 
         return $this->respondWithOk($ride);
     }
@@ -85,7 +85,7 @@ class RideController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        $this->rideService->update($id, $request->toArray());
+        $this->rideService->update($id, $request->toArray(), $request->user()->id);
 
         return $this->respondWithOk();
     }
@@ -93,9 +93,9 @@ class RideController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function delete(string $id)
+    public function delete(string $id, Request $request)
     {
-        $this->rideService->delete($id);
+        $this->rideService->delete($id, $request->user()->id);
 
         return $this->respondWithOk();
     }

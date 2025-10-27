@@ -26,9 +26,14 @@ class PassengerRideRepository
         return $ride->update($data);
     }
 
-    public function delete(PassengerRide $ride)
+    public function delete($ride, $userId)
     {
-        return $ride->delete();
+        $ride = PassengerRide::where('id', $ride)
+                             ->where('user_id', $userId)
+                             ->first();
+        $ride->status = PassengerRide::STATUS['CANCELLED'];
+
+        return $ride->save();
     }
 
     public function handleReservation(PassengerRide $passengerRide, $action)

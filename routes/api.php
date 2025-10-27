@@ -46,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/passengerRides/{passenger_ride_id}', [PassengerRideController::class, 'update']);
     Route::delete('/passengerRides/{passenger_ride_id}', [PassengerRideController::class, 'delete']);
     Route::post('/passengerRides/{passenger_ride_id}/handleReservation', [PassengerRideController::class, 'handleReservation']);
+    Route::delete('/passengerRides/{passenger_ride_id}/user/{user_id}', [PassengerRideController::class, 'removePassengerFromRide']);
 
     Route::get('/conversations', [ConversationController::class, 'index']);
     Route::post('/conversations', [ConversationController::class, 'store']);

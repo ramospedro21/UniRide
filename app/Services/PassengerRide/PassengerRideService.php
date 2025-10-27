@@ -33,10 +33,9 @@ class PassengerRideService
         return $this->passengerRideRepository->update($ride, $data);
     }
 
-    public function delete($id)
+    public function delete($id, $userId)
     {
-        $ride = $this->passengerRideRepository->find($id);
-        return $this->passengerRideRepository->delete($ride);
+        return $this->passengerRideRepository->delete($id, $userId);
     }
 
     public function handleReservation($id, $action)

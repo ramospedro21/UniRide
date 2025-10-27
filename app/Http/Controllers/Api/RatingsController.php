@@ -34,8 +34,8 @@ class RatingsController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "ride_id" => "required|integer",
-                "reviewed_id" => "required|string",
-                "score" => "required|string|between:1,5",
+                "reviewed_id" => "required",
+                "score" => "required|between:1,5",
                 "comment" => "nullable|string",
             ]);
 

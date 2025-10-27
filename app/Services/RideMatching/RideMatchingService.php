@@ -26,29 +26,10 @@ class RideMatchingService
         $rating = $ride->driver ? $ride->driver->averageRating() : 0;
         $ratingNorm = $this->normalizeRating($rating); // já normaliza para 0-1
 
-        // --- Dias da semana ---
-        $weekDaysMap = [
-            'Segunda-feira' => 0,
-            'Terça-feira'   => 1,
-            'Quarta-feira'  => 2,
-            'Quinta-feira'  => 3,
-            'Sexta-feira'   => 4,
-            'Sábado'        => 5,
-            'Domingo'       => 6,
-        ];
-
         $requestedDays = $preferences['days'] ?? [];
         $rideDays = $ride->weekDays->pluck('day_of_week')->toArray() ?? [];
 
-        // Converte para índices numéricos
-        $requestedDaysNumeric = array_map(fn($d) => $weekDaysMap[$d] ?? null, $requestedDays);
-        $requestedDaysNumeric = array_filter($requestedDaysNumeric, fn($d) => $d !== null);
-
-        $rideDaysNumeric = array_map(fn($d) => $weekDaysMap[$d] ?? null, $rideDays);
-        $rideDaysNumeric = array_filter($rideDaysNumeric, fn($d) => $d !== null);
-
-        // Score de coincidência de dias
-        $dayScore = count(array_intersect($requestedDaysNumeric, $rideDaysNumeric)) / max(count($requestedDaysNumeric), 1);
+        $dayScore = count(array_intersect($requestedDays, $rideDays)) / max(count($requestedDays), 1);
 
         // --- Score final com heurística multicritério ---
         $score = (

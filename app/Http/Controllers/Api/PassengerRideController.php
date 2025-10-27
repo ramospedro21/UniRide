@@ -168,4 +168,26 @@ class PassengerRideController extends Controller
             return $this->respondWithErrors($e->getMessage());
         }
     }
+
+    public function removePassengerFromRide(int $passenger_ride_id, int $user_id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $passengerRide = $this->passengerRideService->show($passenger_ride_id);
+
+            if (!$passengerRide || $passengerRide->user_id != $user_id) {
+                return $this->respondWithErrors("Reserva de passageiro não encontrada ou usuário inválido.");
+            }
+
+            $this->passengerRideService->delete($passenger_ride_id, $user_id);
+
+            DB::commit();
+
+            return $this->respondWithOk();
+
+        } catch (\Exception $e) {
+            return $this->respondWithErrors($e->getMessage());
+        }
+    }
 }

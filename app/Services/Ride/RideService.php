@@ -46,6 +46,8 @@ class RideService
                 'week_days' => $ride->week_days_translated,
                 'departure_address' => $ride->departure_address,
                 'arrival_address' => $ride->arrival_address,
+                'short_departure_address' => $ride->short_departure_address,
+                'short_arrival_address' => $ride->short_arrival_address,
                 'matching_score' => $score,
             ];
         });
@@ -63,20 +65,20 @@ class RideService
         return $ride;
     }
 
-    public function show($id)
+    public function show($user_id, $id)
     {
-        return $this->rideRepository->find($id);
+        return $this->rideRepository->find($id, $user_id);
     }
 
-    public function update($id, array $data)
+    public function update($id, array $data, $user_id)
     {
-        $ride = $this->rideRepository->find($id);
+        $ride = $this->rideRepository->find($id, $user_id);
         return $this->rideRepository->update($ride, $data);
     }
 
-    public function delete($id)
+    public function delete($id, $user_id)
     {
-        $ride = $this->rideRepository->find($id);
+        $ride = $this->rideRepository->find($id, $user_id);
         return $this->rideRepository->delete($ride);
     }
 

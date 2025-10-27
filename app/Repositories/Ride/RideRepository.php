@@ -14,22 +14,19 @@ class RideRepository
         return Ride::get();
     }
 
-    public function find($id)
+    public function find($id, $userId)
     {
-        $ride = Ride::with('driver', 'passengerRides.passenger', 'car')->find($id);
+        $ride = Ride::with([
+            'car',
+            'reviews',
+            'driver',
+            'passengerRides.passenger.receivedRatings' => function($query) use ($id) {
+                $query->where('ride_id', $id);
+            }
+        ])->find($id);
 
-        $ride->passengers = $ride->passengerRides
-        ->filter(fn($pr) => in_array($pr->status, [
-            PassengerRide::STATUS['PENDING'],
-            PassengerRide::STATUS['ACCEPTED']
-        ]))
-        ->map(fn($pr) => [
-            'id' => $pr->passenger->id,
-            'passenger_ride_id' => $pr->id,
-            'name' => $pr->passenger->name,
-            'phone' => $pr->passenger->phone,
-            'status' => $pr->status === PassengerRide::STATUS['PENDING'] ? 'Pendente' : 'Confirmada'
-        ]);
+        $ride->authUserReview = $ride->reviews
+            ->firstWhere('reviewer_id', $userId);
 
         return $ride;
     }
@@ -98,9 +95,14 @@ class RideRepository
 
     public function getRequestedByUser(int $userId)
     {
-        return PassengerRide::with('ride')
-            ->where('user_id', $userId)
-            ->get();
+        return PassengerRide::with([
+                    'ride.reviews' => function ($query) use ($userId) {
+                        $query->where('reviewer_id', $userId);
+                    }
+                ])
+                ->where('user_id', $userId)
+                ->get();
+
     }
 
     public function getOfferedByUser(int $userId)

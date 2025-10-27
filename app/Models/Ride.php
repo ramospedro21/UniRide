@@ -20,7 +20,7 @@ class Ride extends Model
         'ride_fare'
     ];
 
-    protected $appends = ['week_days_translated'];
+    protected $appends = ['week_days_translated', 'short_departure_address', 'short_arrival_address'];
 
     public function passengerRides()
     {
@@ -42,6 +42,11 @@ class Ride extends Model
         return $this->hasMany(RideWeekDay::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Rating::class, 'ride_id');
+    }
+
     public function getWeekDaysTranslatedAttribute()
     {
         $days = [
@@ -55,5 +60,56 @@ class Ride extends Model
         ];
 
         return $this->weekDays->map(fn($wd) => $days[$wd->day_of_week] ?? null);
+    }
+    
+    public function getShortDepartureAddressAttribute()
+    {
+        return $this->formatDepartureAddress($this->departure_address);
+    }
+
+    public function getShortArrivalAddressAttribute()
+    {
+        return $this->formatArrivalAddress($this->arrival_address);
+    }
+
+    private function formatDepartureAddress(?string $address): ?string
+    {
+        if (!$address) return null;
+
+        $parts = explode(',', $address);
+
+        // Rua + número (primeira parte)
+        $streetAndNumber = trim($parts[0] ?? '');
+
+        // Cidade (sempre antes do "- SP" ou "- São Paulo")
+        $city = '';
+        foreach ($parts as $part) {
+            if (stripos($part, 'São José dos Campos') !== false) {
+                $city = 'São José dos Campos';
+                break;
+            }
+        }
+
+        return "{$streetAndNumber}, {$city}";
+    }
+
+    private function formatArrivalAddress(?string $address): ?string
+    {
+        if (!$address) return null;
+
+        // Pega a primeira parte (ex: "UNIP - Rod. Pres. Dutra")
+        $parts = explode(',', $address);
+        $place = trim($parts[0] ?? '');
+
+        // Cidade (vai estar em alguma parte com "São José dos Campos")
+        $city = '';
+        foreach ($parts as $part) {
+            if (stripos($part, 'São José dos Campos') !== false) {
+                $city = 'São José dos Campos';
+                break;
+            }
+        }
+
+        return "{$place}, {$city}";
     }
 }
