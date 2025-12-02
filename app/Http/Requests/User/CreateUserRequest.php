@@ -22,13 +22,16 @@ class CreateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'            => 'required|string|max:255',
-            'surname'         => 'required|string|max:255',
-            'cellphone'       => 'required|string|max:11',
-            'email'           => 'required|email|unique:users',
-            'password'        => 'required|string|min:6',
-            'document'        => 'required|string|unique:users|max:11',
-            'driver_document' => 'sometimes|nullable|string|unique:users|max:11'
+            'name'                 => 'required|string|max:255',
+            'surname'              => 'required|string|max:255',
+            'cellphone'            => 'required|string|max:11',
+            'email'                => 'required|email|unique:users',
+            'password'             => 'required|string|min:6',
+            'document'             => 'required|string|unique:users|max:11',
+            'driver_document'      => 'sometimes|nullable|string|unique:users|max:11',
+            'driver_document_code' => 'sometimes|nullable|string|max:20',
+            'profile_photo'        => 'sometimes|nullable|string|max:255',
+            'device_token'         => 'sometimes|nullable|string|max:255',
         ];
     }
 }
