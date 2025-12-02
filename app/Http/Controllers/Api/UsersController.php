@@ -107,7 +107,9 @@ class UsersController extends Controller
                 return $this->respondWithErrors(['message' => 'User not found or update failed'], 404);
             }
 
-            return $this->respondWithOk($user);
+            $userToReturn = $this->userService->show($id);
+
+            return $this->respondWithOk($userToReturn);
 
         } catch (ValidationException $e) {
             $firstError = $e->validator->errors()->first();

@@ -3,6 +3,7 @@
 namespace App\Services\Car;
 
 use App\Repositories\Car\CarRepository;
+use DragonCode\Contracts\Cashier\Auth\Auth;
 
 class CarService
 {

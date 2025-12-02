@@ -27,7 +27,8 @@ class AuthController extends Controller
                 'cellphone' => 'required|string|max:11',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|string|min:6',
-                'document' => 'required|string|unique:users|max:11'
+                'document' => 'required|string|unique:users|max:11',
+                'driver_document' => 'sometimes|nullable|string|unique:users|max:11'
             ]);
 
             if ($validator->fails()) {

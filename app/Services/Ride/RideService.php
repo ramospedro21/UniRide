@@ -27,6 +27,8 @@ class RideService
             return count(array_intersect($requestedDays, $rideDays)) > 0;
         })->map(function ($ride) use ($data) {
 
+            if(!$ride->driver) return null;
+
             $score = $this->matchingService->calculateScore($ride, $data);
 
             return [

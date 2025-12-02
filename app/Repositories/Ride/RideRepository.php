@@ -64,7 +64,7 @@ class RideRepository
         $departureLng = $data['departure_long'] ?? null;
         $arrivalLat = $data['arrival_lat'] ?? null;
         $arrivalLng = $data['arrival_long'] ?? null;
-        $maxDistanceKm = 10;
+        $maxDistanceKm = 5;
 
         return Ride::with(['driver', 'car', 'weekDays'])
             ->leftJoin('passenger_rides', 'rides.id', '=', 'passenger_rides.ride_id')

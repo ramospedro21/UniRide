@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cars/{car_id}', [CarController::class, 'show']);
     Route::patch('/cars/{car_id}', [CarController::class, 'update']);
     Route::delete('/cars/{car_id}', [CarController::class, 'delete']);
-    Route::get('/getCarsByUser/{user_id}', [CarController::class, 'getCarsByUser']);
+    Route::get('/getCarsByUser', [CarController::class, 'getCarsByUser']);
 
     Route::get('/rides', [RideController::class, 'index']);
     Route::post('/rides', [RideController::class, 'store']);
