@@ -39,4 +39,9 @@ class UserService
         return $this->userRepository->delete($user);
     }
 
+    public function formatResponseUserDTO($user)
+    {
+        return new \App\DTOs\User\ResponseUserDTO($user);
+    }
+
 }

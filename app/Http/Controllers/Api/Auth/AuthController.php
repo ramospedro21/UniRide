@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\CreateUserRequest;
+use App\Http\Requests\User\LoginUserRequest;
 use App\Models\User;
 use App\Services\User\UserService;
 use Illuminate\Support\Facades\Validator;
@@ -15,27 +17,14 @@ class AuthController extends Controller
     protected $userService;
 
     public function __construct(UserService $userService) {
+
         $this->userService = $userService;
     }
 
-    public function register(Request $request)
+    public function register(CreateUserRequest $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
-                'surname' => 'required|string|max:255',
-                'cellphone' => 'required|string|max:11',
-                'email' => 'required|email|unique:users',
-                'password' => 'required|string|min:6',
-                'document' => 'required|string|unique:users|max:11',
-                'driver_document' => 'sometimes|nullable|string|unique:users|max:11'
-            ]);
-
-            if ($validator->fails()) {
-                throw new ValidationException($validator);
-            }
-
-            $data = $validator->validated();
+            $data = $request->validated();
 
             $this->userService->create($data);
 
@@ -52,22 +41,21 @@ class AuthController extends Controller
 
     }
 
-    public function login(Request $request)
+    public function login(LoginUserRequest $request)
     {
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
+        $data = $request->validated();
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $data['email'])->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($data['password'], $user->password)) {
             return response()->json(['message' => 'Credenciais inválidas'], 401);
         }
 
         $token = $user->createToken('app-token')->plainTextToken;
 
-        return response()->json([
+        $user = $this->userService->formatResponseUserDTO($user);
+
+        return $this->respondWithOk([
             'access_token' => $token,
             'token_type'   => 'Bearer',
             'user'         => $user
@@ -76,6 +64,7 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        return response()->json($request->user());
+        $user = $this->userService->formatResponseUserDTO($request->user());
+        return $this->respondWithOk($user);
     }
 }
