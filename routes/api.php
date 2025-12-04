@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/save-device-token', [NotificationController::class, 'store']);
 
     Route::get('/users/{user_id}', [UsersController::class, 'show']);
-    Route::post('/users/{user_id}', [UsersController::class, 'update']);
+    Route::post('/users/{user}', [UsersController::class, 'update']);
     Route::delete('/users/{user_id}', [UsersController::class, 'delete']);
 
     Route::get('/cars', [CarController::class, 'index']);

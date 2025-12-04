@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
 use App\Services\User\UserService;
 use Illuminate\Validation\Rule;
@@ -40,7 +41,7 @@ class UsersController extends Controller
      */
     public function show(string $id)
     {
-        $user = $this->userService->show($id);
+        $user = $this->userService->formatResponseUserDTO($this->userService->show($id));
 
         if (!$user) {
             return $this->respondWithErrors(['message' => 'User not found'], 404);
@@ -52,54 +53,11 @@ class UsersController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, string $id)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
-                'surname' => 'required|string|max:255',
-                'email' => [
-                    'required',
-                    'string',
-                    'email',
-                    'max:255',
-                    Rule::unique('users', 'email')->ignore($id, 'id'),
-                ],
-                'cellphone' => [
-                    'required',
-                    'string',
-                    'max:255',
-                    Rule::unique('users', 'cellphone')->ignore($id, 'id'),
-                ],
-                'document' => [
-                    'required',
-                    'string',
-                    'max:255',
-                    Rule::unique('users', 'document')->ignore($id, 'id'),
-                ],
-                'password' => 'sometimes|nullable|string|min:6|confirmed',
-                'driver_document' => [
-                    'sometimes',
-                    'nullable',
-                    'string',
-                    'max:255',
-                    Rule::unique('users', 'driver_document')->ignore($id, 'id'),
-                ],
-                'driver_document_code' => [
-                    'sometimes',
-                    'nullable',
-                    'string',
-                    'max:255',
-                    Rule::unique('users', 'driver_document_code')->ignore($id, 'id'),
-                ],
-                'profile_photo' => 'sometimes|nullable|string|max:255',
-            ]);
 
-            if ($validator->fails()) {
-                throw new ValidationException($validator);
-            }
-
-            $data = $validator->validated();
+            $data = $request->validated();
 
             $user = $this->userService->update($id, $data);
 
@@ -107,7 +65,7 @@ class UsersController extends Controller
                 return $this->respondWithErrors(['message' => 'User not found or update failed'], 404);
             }
 
-            $userToReturn = $this->userService->show($id);
+            $userToReturn = $this->userService->formatResponseUserDTO($this->userService->show($id));
 
             return $this->respondWithOk($userToReturn);
 

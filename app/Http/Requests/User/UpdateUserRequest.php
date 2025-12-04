@@ -3,8 +3,9 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class CreateUserRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,12 +25,29 @@ class CreateUserRequest extends FormRequest
         return [
             'name'                 => 'required|string|max:255',
             'surname'              => 'required|string|max:255',
+            'email'                => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($this->user)
+            ],
             'cellphone'            => 'required|string|max:11',
-            'email'                => 'required|email|unique:users',
+            'document'             => [
+                'required',
+                'string',
+                Rule::unique('users')->ignore($this->user),
+                'max:11'
+            ],
             'password'             => 'required|string|min:6',
-            'document'             => 'required|string|unique:users|max:11',
-            'driver_document'      => 'sometimes|nullable|string|unique:users|max:11',
-            'driver_document_code' => 'sometimes|nullable|string|max:20',
+            'driver_document'      => [
+                'sometimes',
+                'nullable',
+                'string',
+                Rule::unique('users')->ignore($this->user),
+                'max:11'
+            ],
+            'driver_document_code' => 'sometimes|nullable|string|max:255',
             'profile_photo'        => 'sometimes|nullable|string|max:255',
         ];
     }
